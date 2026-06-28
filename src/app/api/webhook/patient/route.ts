@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { Gender, Language } from '@prisma/client';
+import { Language } from '@prisma/client';
 
 export async function POST(request: Request) {
   try {
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     }
 
     const ageInt = age ? parseInt(age) : undefined;
-    const genderEnum = gender ? (gender as Gender) : undefined;
+    const genderStr = gender ? String(gender) : undefined;
 
     const patient = await prisma.$transaction(async (tx) => {
       // Upsert patient profile
@@ -24,13 +24,13 @@ export async function POST(request: Request) {
         update: {
           name,
           age: ageInt,
-          gender: genderEnum,
+          gender: genderStr,
         },
         create: {
           phone,
           name,
           age: ageInt || 0,
-          gender: genderEnum || 'OTHER',
+          gender: genderStr || 'OTHER',
         },
       });
 

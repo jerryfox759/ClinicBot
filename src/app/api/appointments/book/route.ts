@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAvailableSlots } from '@/lib/booking';
-import { Gender } from '@prisma/client';
 
 export async function POST(request: Request) {
   try {
@@ -50,7 +49,7 @@ export async function POST(request: Request) {
     }
 
     const ageInt = parseInt(patientAge);
-    const genderEnum = patientGender as Gender;
+    const genderStr = String(patientGender);
 
     const startOfDay = new Date(date);
     startOfDay.setUTCHours(0, 0, 0, 0);
@@ -61,8 +60,8 @@ export async function POST(request: Request) {
       // 1. Upsert Patient details
       const patient = await tx.patient.upsert({
         where: { phone: patientPhone },
-        update: { name: patientName, age: ageInt, gender: genderEnum, address: patientAddress || null },
-        create: { name: patientName, phone: patientPhone, age: ageInt, gender: genderEnum, address: patientAddress || null },
+        update: { name: patientName, age: ageInt, gender: genderStr, address: patientAddress || null },
+        create: { name: patientName, phone: patientPhone, age: ageInt, gender: genderStr, address: patientAddress || null },
       });
 
       // 2. Count today's bookings for serial Token
