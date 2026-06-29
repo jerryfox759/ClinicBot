@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
-  Activity, Calendar, Clock, DollarSign, FileText, Settings, Users,
+  Activity, Calendar, Clock, IndianRupee, FileText, Settings, Users,
   Home, UserPlus, Search, Ticket, CheckSquare, LayoutDashboard,
   Award, Key, HeartPulse
 } from 'lucide-react';
@@ -22,7 +22,7 @@ export default function Sidebar({ activeRole }: SidebarProps) {
           { href: '/admin', label: 'Dashboard', icon: Home },
           { href: '/admin/doctors', label: 'Manage Doctors', icon: Users },
           { href: '/admin/subscriptions', label: 'Subscriptions', icon: Award },
-          { href: '/admin/revenue', label: 'Revenue Analytics', icon: DollarSign },
+          { href: '/admin/revenue', label: 'Revenue Analytics', icon: IndianRupee },
           { href: '/admin/system-health', label: 'System Health', icon: Activity },
           { href: '/admin/audit-logs', label: 'Audit Logs', icon: Key },
         ];
@@ -31,7 +31,7 @@ export default function Sidebar({ activeRole }: SidebarProps) {
           { href: '/doctor', label: 'Dashboard', icon: Home },
           { href: '/doctor/calendar', label: 'Calendar View', icon: Calendar },
           { href: '/doctor/working-hours', label: 'Working Hours', icon: Clock },
-          { href: '/doctor/fees', label: 'Consultation Fees', icon: DollarSign },
+          { href: '/doctor/fees', label: 'Consultation Fees', icon: IndianRupee },
           { href: '/doctor/patients', label: 'Patient History', icon: Users },
           { href: '/doctor/medical-notes', label: 'Medical Notes', icon: FileText },
           { href: '/doctor/settings', label: 'Chamber Settings', icon: Settings },
@@ -59,7 +59,7 @@ export default function Sidebar({ activeRole }: SidebarProps) {
           <HeartPulse size={22} />
         </div>
         <div>
-          <span className="font-extrabold text-lg text-foreground tracking-tight block">ClinicBot AI</span>
+          <span className="font-extrabold text-lg text-foreground tracking-tight block">ClinicSuite</span>
           <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Chamber Platform</span>
         </div>
       </div>

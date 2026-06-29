@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ClinicBot AI — Doctor Chamber Automation Platform",
-  description: "Production-ready multi-tenant SaaS automating appointment booking via WhatsApp, Gemini AI, and n8n.",
+  title: "ClinicSuite SaaS — Chamber & Clinic Management Platform",
+  description: "Production-ready multi-tenant SaaS for doctors and clinics to manage calendar scheduling, receptionist workflows, patient records, and recurring billing.",
 };
 
 export default function RootLayout({

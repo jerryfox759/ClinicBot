@@ -4,7 +4,7 @@ import { hashPassword, signJWT } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
-    const { email, password, name, role, clinicName, specialty } = await request.json();
+    const { email, password, name, role, clinicName, specialty, planId } = await request.json();
 
     if (!email || !password || !name || !role) {
       return NextResponse.json(
@@ -61,6 +61,48 @@ export async function POST(request: Request) {
           },
         });
         doctorId = doctor.id;
+
+        // 1. Assign Subscription Plan
+        let targetPlan = null;
+        if (planId) {
+          targetPlan = await tx.plan.findUnique({
+            where: { id: planId },
+          });
+        }
+        
+        if (!targetPlan) {
+          targetPlan = await tx.plan.findFirst({
+            orderBy: { price: 'asc' },
+          });
+        }
+
+        if (targetPlan) {
+          await tx.subscription.create({
+            data: {
+              doctorId: doctor.id,
+              planId: targetPlan.id,
+              status: 'ACTIVE',
+              startDate: new Date(),
+              endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+            },
+          });
+        }
+
+        // 2. Create default working days (Monday - Saturday)
+        const days = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+        for (const day of days) {
+          await tx.workingDay.create({
+            data: {
+              doctorId: doctor.id,
+              dayOfWeek: day,
+              isWorking: true,
+              startTime: '10:00',
+              endTime: '17:00',
+              breakStart: '13:00',
+              breakEnd: '14:00',
+            },
+          });
+        }
       }
 
       return { user, clinicId, doctorId };
