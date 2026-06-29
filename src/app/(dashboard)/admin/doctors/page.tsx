@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Users, Search, Loader2 } from 'lucide-react';
+import { Users, Search, Loader2, Plus, X, KeyRound } from 'lucide-react';
 
 interface Doctor {
   id: string;
@@ -22,13 +22,33 @@ interface Doctor {
   }[];
 }
 
+interface Plan {
+  id: string;
+  name: string;
+  price: number;
+}
+
 export default function AdminDoctorsPage() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
 
+  // Add Doctor Form States
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [formName, setFormName] = useState('');
+  const [formEmail, setFormEmail] = useState('');
+  const [formPassword, setFormPassword] = useState('');
+  const [formSpecialty, setFormSpecialty] = useState('');
+  const [formClinicName, setFormClinicName] = useState('');
+  const [formPlanId, setFormPlanId] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [formSuccess, setFormSuccess] = useState('');
+
   useEffect(() => {
     fetchDoctors();
+    fetchPlans();
   }, []);
 
   const fetchDoctors = async () => {
@@ -42,6 +62,78 @@ export default function AdminDoctorsPage() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPlans = async () => {
+    try {
+      const res = await fetch('/api/admin/plans');
+      const data = await res.json();
+      if (res.ok && data.plans) {
+        setPlans(data.plans);
+        if (data.plans.length > 0) {
+          setFormPlanId(data.plans[0].id);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const generatePassword = () => {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+    let pass = '';
+    for (let i = 0; i < 12; i++) {
+      pass += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setFormPassword(pass);
+  };
+
+  const handleAddDoctor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError('');
+    setFormSuccess('');
+    setSubmitting(true);
+
+    try {
+      const res = await fetch('/api/admin/doctors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formName,
+          email: formEmail,
+          password: formPassword,
+          specialty: formSpecialty,
+          clinicName: formClinicName,
+          planId: formPlanId,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to add doctor');
+      }
+
+      setFormSuccess('Doctor registered successfully!');
+      setFormName('');
+      setFormEmail('');
+      setFormPassword('');
+      setFormSpecialty('');
+      setFormClinicName('');
+      if (plans.length > 0) {
+        setFormPlanId(plans[0].id);
+      }
+
+      fetchDoctors();
+
+      setTimeout(() => {
+        setIsAddModalOpen(false);
+        setFormSuccess('');
+      }, 1500);
+    } catch (err: any) {
+      setFormError(err.message || 'Something went wrong');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -61,18 +153,28 @@ export default function AdminDoctorsPage() {
           <p className="text-muted-foreground mt-1">Directory of all registered multi-tenant doctors, chambers, and subscription settings.</p>
         </div>
 
-        {/* Search */}
-        <div className="relative w-64 max-w-xs self-start">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
-            <Search size={16} />
-          </span>
-          <input
-            type="text"
-            placeholder="Search doctors or chambers..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-xs border border-border rounded-xl bg-secondary/50 focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent transition-all"
-          />
+        {/* Search & Actions */}
+        <div className="flex items-center gap-3 self-start sm:self-auto w-full sm:w-auto">
+          <div className="relative w-full sm:w-64 max-w-xs">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+              <Search size={16} />
+            </span>
+            <input
+              type="text"
+              placeholder="Search doctors or chambers..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 text-xs border border-border rounded-xl bg-secondary/50 focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent transition-all"
+            />
+          </div>
+
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-xl hover:bg-primary/95 transition-all shadow-md shadow-primary/15 cursor-pointer whitespace-nowrap"
+          >
+            <Plus size={16} />
+            <span>Add Doctor</span>
+          </button>
         </div>
       </div>
 
@@ -128,6 +230,164 @@ export default function AdminDoctorsPage() {
           </div>
         )}
       </div>
+
+      {/* Add Doctor Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+            onClick={() => setIsAddModalOpen(false)}
+          />
+
+          <div className="relative w-full max-w-lg p-6 bg-card border border-border rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <button
+              onClick={() => setIsAddModalOpen(false)}
+              className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-xl transition-all cursor-pointer"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-xl font-extrabold text-foreground tracking-tight">Register New Doctor</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">Create a doctor profile, initialize their chamber, and assign a pricing subscription.</p>
+              </div>
+
+              {formError && (
+                <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-xl text-xs font-medium text-destructive animate-pulse">
+                  {formError}
+                </div>
+              )}
+
+              {formSuccess && (
+                <div className="p-3 bg-teal-500/10 border border-teal-500/20 rounded-xl text-xs font-medium text-teal-600 dark:text-teal-400">
+                  {formSuccess}
+                </div>
+              )}
+
+              <form onSubmit={handleAddDoctor} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Full Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={formName}
+                      onChange={(e) => setFormName(e.target.value)}
+                      placeholder="Dr. John Doe"
+                      className="w-full px-3 py-2 text-xs border border-border rounded-xl bg-secondary/30 focus:outline-none focus:ring-1 focus:ring-primary transition-all text-foreground"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Email Address</label>
+                    <input
+                      type="email"
+                      required
+                      value={formEmail}
+                      onChange={(e) => setFormEmail(e.target.value)}
+                      placeholder="john.doe@clinicbot.ai"
+                      className="w-full px-3 py-2 text-xs border border-border rounded-xl bg-secondary/30 focus:outline-none focus:ring-1 focus:ring-primary transition-all text-foreground"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Password</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        required
+                        value={formPassword}
+                        onChange={(e) => setFormPassword(e.target.value)}
+                        placeholder="Min 6 chars"
+                        className="w-full pl-3 pr-8 py-2 text-xs border border-border rounded-xl bg-secondary/30 focus:outline-none focus:ring-1 focus:ring-primary transition-all text-foreground"
+                      />
+                      <button
+                        type="button"
+                        onClick={generatePassword}
+                        title="Generate secure password"
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-all cursor-pointer"
+                      >
+                        <KeyRound size={14} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Specialty</label>
+                    <input
+                      type="text"
+                      required
+                      value={formSpecialty}
+                      onChange={(e) => setFormSpecialty(e.target.value)}
+                      placeholder="e.g. Cardiologist, Dermatologist"
+                      className="w-full px-3 py-2 text-xs border border-border rounded-xl bg-secondary/30 focus:outline-none focus:ring-1 focus:ring-primary transition-all text-foreground"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Chamber/Clinic Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={formClinicName}
+                      onChange={(e) => setFormClinicName(e.target.value)}
+                      placeholder="e.g. Metro Care Heart Clinic"
+                      className="w-full px-3 py-2 text-xs border border-border rounded-xl bg-secondary/30 focus:outline-none focus:ring-1 focus:ring-primary transition-all text-foreground"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Subscription Plan</label>
+                    <select
+                      required
+                      value={formPlanId}
+                      onChange={(e) => setFormPlanId(e.target.value)}
+                      className="w-full px-3 py-2 text-xs border border-border rounded-xl bg-secondary/30 focus:outline-none focus:ring-1 focus:ring-primary transition-all text-foreground"
+                    >
+                      <option value="" disabled>Select a plan...</option>
+                      {plans.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name} (₹{p.price}/mo)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddModalOpen(false)}
+                    className="px-4 py-2 border border-border hover:bg-secondary text-xs font-bold rounded-xl transition-all cursor-pointer text-foreground"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex items-center gap-1.5 px-5 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-xl hover:bg-primary/95 transition-all shadow-md shadow-primary/15 cursor-pointer disabled:opacity-50"
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader2 className="animate-spin" size={14} />
+                        <span>Registering...</span>
+                      </>
+                    ) : (
+                      <span>Register Doctor</span>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

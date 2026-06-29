@@ -3,7 +3,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import AdminCharts from '@/components/dashboard/AdminCharts';
 import PlansManager from '@/components/dashboard/PlansManager';
-import { Building, Users, CreditCard, DollarSign, Activity } from 'lucide-react';
+import { Building, Users, CreditCard, IndianRupee, Activity } from 'lucide-react';
 
 export default async function AdminDashboardPage() {
   const user = await getCurrentUser();
@@ -74,10 +74,10 @@ export default async function AdminDashboardPage() {
           <div className="flex justify-between items-start">
             <div>
               <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">MRR Billing</span>
-              <h2 className="text-3xl font-extrabold text-teal-600 dark:text-teal-400 mt-2">${activeBillingMRR.toFixed(2)}</h2>
+              <h2 className="text-3xl font-extrabold text-teal-600 dark:text-teal-400 mt-2">₹{activeBillingMRR.toFixed(2)}</h2>
             </div>
             <div className="p-2.5 bg-teal-500/10 rounded-xl text-teal-600 dark:text-teal-400">
-              <DollarSign size={18} />
+              <IndianRupee size={18} />
             </div>
           </div>
           <p className="text-[10px] text-muted-foreground mt-2">Recurring monthly recurring revenue</p>

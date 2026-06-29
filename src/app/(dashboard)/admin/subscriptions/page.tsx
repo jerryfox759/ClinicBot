@@ -132,7 +132,7 @@ export default function AdminSubscriptionsPage() {
                     </td>
                     <td className="py-3.5">
                       <p className="font-semibold text-muted-foreground">{sub.plan.name}</p>
-                      <p className="text-[10px] text-teal-600 dark:text-teal-400 mt-0.5">${sub.plan.price}/month</p>
+                      <p className="text-[10px] text-teal-600 dark:text-teal-400 mt-0.5">₹{sub.plan.price}/month</p>
                     </td>
                     <td className="py-3.5 text-muted-foreground font-semibold">
                       {new Date(sub.endDate).toLocaleDateString()}

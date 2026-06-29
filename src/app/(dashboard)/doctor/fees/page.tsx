@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DollarSign, Clock, Plus, Trash2, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { IndianRupee, Clock, Plus, Trash2, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface Fee {
   id: string;
@@ -179,7 +179,7 @@ export default function FeesPage() {
                 <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Regular Consultation Fee (₹)</label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground pointer-events-none">
-                    <DollarSign size={16} />
+                    <IndianRupee size={16} />
                   </span>
                   <input
                     type="number"
@@ -225,7 +225,7 @@ export default function FeesPage() {
           {/* Custom Tiers */}
           <div className="p-6 rounded-3xl border border-border bg-card flex flex-col h-fit">
             <div className="flex items-center space-x-2 pb-4 border-b border-border mb-6">
-              <DollarSign className="text-primary" size={20} />
+              <IndianRupee className="text-primary" size={20} />
               <h2 className="text-lg font-bold">Custom Fee Tiers</h2>
             </div>
 

@@ -162,7 +162,7 @@ export default function PlansManager() {
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <span className="text-base font-extrabold text-indigo-500">${plan.price}</span>
+                  <span className="text-base font-extrabold text-indigo-500">₹{plan.price}</span>
                   <button
                     onClick={() => handleDeletePlan(plan.id)}
                     disabled={deletingId === plan.id}
@@ -199,7 +199,7 @@ export default function PlansManager() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Price ($)</label>
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Price (₹)</label>
             <input
               type="number"
               required

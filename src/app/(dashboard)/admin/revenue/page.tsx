@@ -48,7 +48,7 @@ export default function AdminRevenuePage() {
                     PAID
                   </span>
                 </td>
-                <td className="py-3.5 text-right font-extrabold text-teal-600 dark:text-teal-400">$49.00</td>
+                <td className="py-3.5 text-right font-extrabold text-teal-600 dark:text-teal-400">₹49.00</td>
               </tr>
             </tbody>
           </table>
